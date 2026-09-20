@@ -1,0 +1,36 @@
+{
+  "problem": {
+    "name": "Makale deseni - öğretim örneği (9 ürün, 10 görev)",
+    "lineType": "u",
+    "stationCount": 4,
+    "minimumTasks": 1,
+    "speed": 1,
+    "lineLength": 25,
+    "rho": 0.5,
+    "models": [{"id":"A","demand":4},{"id":"B","demand":3},{"id":"C","demand":2}],
+    "tasks": [
+      {"id":"1","times":{"A":5,"B":4,"C":5},"stations":[{"rate":1.10,"waste":1.5},{"rate":1.20,"waste":2.2},{"rate":1.20,"waste":2.2},{"rate":1.10,"waste":1.5}]},
+      {"id":"2","times":{"A":2,"B":3,"C":4},"stations":[{"rate":0.90,"waste":0.8},{"rate":1.15,"waste":1.6},{"rate":1.15,"waste":1.6},{"rate":0.90,"waste":0.8}]},
+      {"id":"3","times":{"A":4,"B":6,"C":5},"stations":[{"rate":1.25,"waste":2.0},{"rate":0.85,"waste":0.7},{"rate":0.85,"waste":0.7},{"rate":1.25,"waste":2.0}]},
+      {"id":"4","times":{"A":4,"B":2,"C":3},"stations":[{"rate":1.15,"waste":1.8},{"rate":0.90,"waste":0.9},{"rate":0.90,"waste":0.9},{"rate":1.15,"waste":1.8}]},
+      {"id":"5","times":{"A":3,"B":6,"C":6},"stations":[{"rate":1.30,"waste":2.4},{"rate":1.05,"waste":1.1},{"rate":1.05,"waste":1.1},{"rate":1.30,"waste":2.4}]},
+      {"id":"6","times":{"A":4,"B":3,"C":5},"stations":[{"rate":1.10,"waste":1.7},{"rate":1.20,"waste":2.0},{"rate":1.20,"waste":2.0},{"rate":1.10,"waste":1.7}]},
+      {"id":"7","times":{"A":5,"B":4,"C":3},"stations":[{"rate":1.20,"waste":2.1},{"rate":0.88,"waste":0.6},{"rate":0.88,"waste":0.6},{"rate":1.20,"waste":2.1}]},
+      {"id":"8","times":{"A":3,"B":5,"C":4},"stations":[{"rate":1.05,"waste":1.4},{"rate":1.18,"waste":1.9},{"rate":1.18,"waste":1.9},{"rate":1.05,"waste":1.4}]},
+      {"id":"9","times":{"A":4,"B":6,"C":5},"stations":[{"rate":1.22,"waste":2.3},{"rate":0.92,"waste":0.8},{"rate":0.92,"waste":0.8},{"rate":1.22,"waste":2.3}]},
+      {"id":"10","times":{"A":6,"B":5,"C":4},"stations":[{"rate":1.28,"waste":2.5},{"rate":0.86,"waste":0.7},{"rate":0.86,"waste":0.7},{"rate":1.28,"waste":2.5}]}
+    ],
+    "positions": [
+      {"A":{"rate":0.92,"waste":0.90},"B":{"rate":1.08,"waste":1.10},"C":{"rate":1.16,"waste":1.20}},
+      {"A":{"rate":0.96,"waste":0.95},"B":{"rate":1.02,"waste":1.00},"C":{"rate":1.12,"waste":1.15}},
+      {"A":{"rate":1.00,"waste":1.00},"B":{"rate":0.96,"waste":0.95},"C":{"rate":1.08,"waste":1.10}},
+      {"A":{"rate":1.04,"waste":1.05},"B":{"rate":0.92,"waste":0.90},"C":{"rate":1.04,"waste":1.05}},
+      {"A":{"rate":1.08,"waste":1.10},"B":{"rate":0.94,"waste":0.92},"C":{"rate":1.00,"waste":1.00}},
+      {"A":{"rate":1.02,"waste":1.00},"B":{"rate":0.98,"waste":0.96},"C":{"rate":0.96,"waste":0.94}},
+      {"A":{"rate":0.98,"waste":0.96},"B":{"rate":1.02,"waste":1.00},"C":{"rate":0.92,"waste":0.90}},
+      {"A":{"rate":0.94,"waste":0.92},"B":{"rate":1.06,"waste":1.05},"C":{"rate":0.98,"waste":0.96}},
+      {"A":{"rate":0.90,"waste":0.88},"B":{"rate":1.10,"waste":1.12},"C":{"rate":1.02,"waste":1.00}}
+    ]
+  },
+  "search": {"temperature":1,"cooling":0.965,"iterations":16000,"seed":42,"weightCycle":1,"weightWaste":1,"weightOverload":1}
+}

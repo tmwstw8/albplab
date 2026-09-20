@@ -1,0 +1,288 @@
+{
+  "problem": {
+    "models": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "demand": {
+      "A": 5,
+      "B": 2,
+      "C": 12,
+      "D": 1
+    },
+    "cycleTime": 180,
+    "tasks": [
+      {
+        "id": 1,
+        "predecessors": [],
+        "times": {
+          "A": 65,
+          "B": 65,
+          "C": 65,
+          "D": 65
+        },
+        "weightedAverage": 65
+      },
+      {
+        "id": 2,
+        "predecessors": [],
+        "times": {
+          "A": 45,
+          "B": 45,
+          "C": 45,
+          "D": 45
+        },
+        "weightedAverage": 45
+      },
+      {
+        "id": 3,
+        "predecessors": [],
+        "times": {
+          "A": 120,
+          "B": 120,
+          "C": 120,
+          "D": 120
+        },
+        "weightedAverage": 120
+      },
+      {
+        "id": 4,
+        "predecessors": [],
+        "times": {
+          "A": 40,
+          "B": 40,
+          "C": 40,
+          "D": 40
+        },
+        "weightedAverage": 40
+      },
+      {
+        "id": 5,
+        "predecessors": [],
+        "times": {
+          "A": 90,
+          "B": 90,
+          "C": 90,
+          "D": 90
+        },
+        "weightedAverage": 90
+      },
+      {
+        "id": 6,
+        "predecessors": [],
+        "times": {
+          "A": 65,
+          "B": 65,
+          "C": 65,
+          "D": 65
+        },
+        "weightedAverage": 65
+      },
+      {
+        "id": 7,
+        "predecessors": [
+          4,
+          5,
+          6
+        ],
+        "times": {
+          "A": 45,
+          "B": 45,
+          "C": 45,
+          "D": 45
+        },
+        "weightedAverage": 45
+      },
+      {
+        "id": 8,
+        "predecessors": [],
+        "times": {
+          "A": 15,
+          "B": 15,
+          "C": 15,
+          "D": 15
+        },
+        "weightedAverage": 15
+      },
+      {
+        "id": 9,
+        "predecessors": [],
+        "times": {
+          "A": 30,
+          "B": 30,
+          "C": 30,
+          "D": 30
+        },
+        "weightedAverage": 30
+      },
+      {
+        "id": 10,
+        "predecessors": [
+          8,
+          9
+        ],
+        "times": {
+          "A": 45,
+          "B": 45,
+          "C": 45,
+          "D": 45
+        },
+        "weightedAverage": 45
+      },
+      {
+        "id": 11,
+        "predecessors": [
+          3,
+          10
+        ],
+        "times": {
+          "A": 90,
+          "B": 90,
+          "C": 90,
+          "D": 90
+        },
+        "weightedAverage": 90
+      },
+      {
+        "id": 12,
+        "predecessors": [],
+        "times": {
+          "A": 165,
+          "B": 165,
+          "C": 165,
+          "D": 165
+        },
+        "weightedAverage": 165
+      },
+      {
+        "id": 13,
+        "predecessors": [],
+        "times": {
+          "A": 160,
+          "B": 160,
+          "C": 160,
+          "D": 160
+        },
+        "weightedAverage": 160
+      },
+      {
+        "id": 14,
+        "predecessors": [
+          7,
+          11,
+          12,
+          13
+        ],
+        "times": {
+          "A": 100,
+          "B": 100,
+          "C": 100,
+          "D": 100
+        },
+        "weightedAverage": 100
+      },
+      {
+        "id": 15,
+        "predecessors": [
+          14
+        ],
+        "times": {
+          "A": 45,
+          "B": 45,
+          "C": 45,
+          "D": 45
+        },
+        "weightedAverage": 45
+      },
+      {
+        "id": 16,
+        "predecessors": [],
+        "times": {
+          "A": 0,
+          "B": 0,
+          "C": 60,
+          "D": 60
+        },
+        "weightedAverage": 39
+      },
+      {
+        "id": 17,
+        "predecessors": [],
+        "times": {
+          "A": 0,
+          "B": 120,
+          "C": 0,
+          "D": 120
+        },
+        "weightedAverage": 18
+      },
+      {
+        "id": 18,
+        "predecessors": [
+          15,
+          16,
+          17
+        ],
+        "times": {
+          "A": 50,
+          "B": 50,
+          "C": 50,
+          "D": 50
+        },
+        "weightedAverage": 50
+      },
+      {
+        "id": 19,
+        "predecessors": [
+          18
+        ],
+        "times": {
+          "A": 30,
+          "B": 30,
+          "C": 30,
+          "D": 30
+        },
+        "weightedAverage": 30
+      },
+      {
+        "id": 20,
+        "predecessors": [
+          18
+        ],
+        "times": {
+          "A": 45,
+          "B": 45,
+          "C": 45,
+          "D": 45
+        },
+        "weightedAverage": 45
+      },
+      {
+        "id": 21,
+        "predecessors": [
+          19,
+          20
+        ],
+        "times": {
+          "A": 120,
+          "B": 120,
+          "C": 120,
+          "D": 120
+        },
+        "weightedAverage": 120
+      }
+    ]
+  },
+  "saParams": {
+    "T0": 1000,
+    "Tmin": 1,
+    "IT": 10,
+    "R": 0.95,
+    "p1": 0.7,
+    "p2": 0.5,
+    "p3": 0.5,
+    "maxIterations": 300000
+  }
+}

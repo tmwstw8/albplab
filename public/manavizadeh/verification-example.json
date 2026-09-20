@@ -1,0 +1,25 @@
+{
+  "problem": {
+    "name": "Küçük doğrulama örneği",
+    "lineType": "u",
+    "stationCount": 2,
+    "minimumTasks": 1,
+    "speed": 1,
+    "lineLength": 18,
+    "rho": 0.5,
+    "cycleLimits": {"A":10,"B":10},
+    "models": [{"id":"A","demand":2},{"id":"B","demand":1}],
+    "tasks": [
+      {"id":"1","times":{"A":4,"B":5},"stations":[{"rate":0.8,"waste":0.5},{"rate":1.2,"waste":1.5}]},
+      {"id":"2","times":{"A":5,"B":4},"stations":[{"rate":1.2,"waste":1.5},{"rate":0.8,"waste":0.5}]},
+      {"id":"3","times":{"A":3,"B":3},"stations":[{"rate":0.9,"waste":0.8},{"rate":1.1,"waste":1.2}]},
+      {"id":"4","times":{"A":3,"B":3},"stations":[{"rate":1.1,"waste":1.2},{"rate":0.9,"waste":0.8}]}
+    ],
+    "positions": [
+      {"A":{"rate":0.9,"waste":0.9},"B":{"rate":1.1,"waste":1.1}},
+      {"A":{"rate":1.0,"waste":1.0},"B":{"rate":1.0,"waste":1.0}},
+      {"A":{"rate":1.1,"waste":1.1},"B":{"rate":0.9,"waste":0.9}}
+    ]
+  },
+  "search": {"temperature":1,"cooling":0.965,"iterations":6000,"seed":42,"weightCycle":1,"weightWaste":1,"weightOverload":1}
+}

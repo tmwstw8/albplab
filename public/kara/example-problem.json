@@ -1,0 +1,18 @@
+{
+  "name": "Illustrative U-line problem",
+  "cycleTime": 16,
+  "models": [
+    { "id": "A", "demand": 0.6 },
+    { "id": "B", "demand": 0.4 }
+  ],
+  "tasks": [
+    { "id": "1", "times": { "A": 4, "B": 5 }, "predecessors": [] },
+    { "id": "2", "times": { "A": 6, "B": 4 }, "predecessors": ["1"] },
+    { "id": "3", "times": { "A": 3, "B": 4 }, "predecessors": ["1"] },
+    { "id": "4", "times": { "A": 5, "B": 6 }, "predecessors": ["2"] },
+    { "id": "5", "times": { "A": 4, "B": 3 }, "predecessors": ["2", "3"] },
+    { "id": "6", "times": { "A": 6, "B": 5 }, "predecessors": ["4", "5"] },
+    { "id": "7", "times": { "A": 3, "B": 4 }, "predecessors": ["5"] },
+    { "id": "8", "times": { "A": 5, "B": 4 }, "predecessors": ["6", "7"] }
+  ]
+}

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>U-Line SA Lab</title><link rel="stylesheet" href="./styles.css"></head>
+<body>
+<header><div><p class="eyebrow">Mixed-model assembly planning</p><h1>U-Line SA Lab</h1><p>Balance tasks, sequence the minimum part set, and inspect every annealing run.</p></div><div class="paper">Kara, Özcan & Peker · 2006 method</div></header>
+<main>
+  <aside>
+    <section><div class="section-title"><h2>Problem</h2><label class="file">Import JSON<input id="file" type="file" accept="application/json,.json"></label></div>
+      <label>Preset<select id="preset"><option value="default-problem.json">21-task / 180 s benchmark</option><option value="paper-example.json">Paper example (4 stations, ADW 41.6)</option></select></label>
+      <label>Name<input id="name" value="Mixed-model U-line"></label>
+      <div class="two"><label>Cycle time (s)<input id="cycle" type="number" min="0.01" step="any" value="180"></label><label>Models <input id="models" value="A:5, B:2, C:12, D:1"></label></div>
+      <p class="hint">Models use <code>ID:demand</code>, separated by commas.</p>
+      <div class="section-title compact"><h3>Tasks</h3><button id="addTask" class="secondary">Add task</button></div>
+      <div class="table-wrap task-scroll"><table id="taskTable"><thead><tr id="taskHead"></tr></thead><tbody></tbody></table></div>
+      <p id="validation" class="error" role="alert"></p>
+    </section>
+    <section><div class="section-title"><h2>Annealing</h2><button id="paperDefaults" class="secondary">Paper defaults</button></div>
+      <div class="param-grid">
+        <label>T₀<input data-param="T0" type="number" value="1000"></label><label>T min<input data-param="Tmin" type="number" value="1"></label>
+        <label>IT<input data-param="IT" type="number" value="10"></label><label>Cooling R<input data-param="R" type="number" step="0.01" value="0.95"></label>
+        <label>Balance p₁<input data-param="p1" type="number" step="0.05" value="0.7"></label><label>Swap p₂<input data-param="p2" type="number" step="0.05" value="0.5"></label>
+        <label>Seq. swap p₃<input data-param="p3" type="number" step="0.05" value="0.5"></label><label>Seed<input data-param="seed" type="number" value="42"></label>
+        <label class="wide">Iteration safety cap<input data-param="maxIterations" type="number" value="300000"></label>
+      </div>
+      <label class="seed-option"><input id="randomSeed" type="checkbox" checked> Use a new random seed for every calculation</label>
+      <label class="seed-option"><input id="continuousSearch" type="checkbox"> Continuous search with a new seed after every result</label>
+      <label class="seed-option"><input id="publishedBenchmark" type="checkbox"> Include the published 4-station solution as a benchmark warm start</label>
+      <div class="actions"><button id="run">Run annealing</button><button id="stop" class="secondary" disabled>Stop</button></div>
+    </section>
+  </aside>
+  <div class="workspace">
+    <section class="hero-panel"><div><p class="eyebrow">Live run</p><h2 id="status">Ready</h2><span id="runSeed" class="run-seed">Seed —</span></div><div class="metrics"><div><span>Stations</span><strong id="mStations">—</strong></div><div><span>Multistations</span><strong id="mMulti">—</strong></div><div><span>ADW</span><strong id="mAdw">—</strong></div><div><span>Overload</span><strong id="mOver">—</strong></div><div><span>Precedence</span><strong id="mPrec">—</strong></div><div><span>Efficiency</span><strong id="mEff">—</strong></div></div><button id="runAgain" class="hero-run">Calculate again</button></section>
+    <section class="history-panel"><div class="section-title"><div><p class="eyebrow">Search results</p><h2>Stored calculations</h2></div><button id="clearHistory" class="secondary" disabled>Clear results</button></div><div id="historyBest" class="best-summary" aria-live="polite"></div><div class="table-wrap"><table id="historyTable" class="history-table"><thead><tr><th><button class="sort-button" data-sort="id">Run</button></th><th><button class="sort-button" data-sort="seed">Seed</button></th><th><button class="sort-button" data-sort="stations">Stations</button></th><th><button class="sort-button" data-sort="multi">Multistations</button></th><th><button class="sort-button" data-sort="adw">ADW</button></th><th><button class="sort-button" data-sort="overload">Overload</button></th><th><button class="sort-button" data-sort="efficiency">Efficiency</button></th><th><button class="sort-button" data-sort="speed">Speed</button></th><th><button class="sort-button" data-sort="seconds">Time</button></th><th></th></tr></thead><tbody id="runHistoryBody"><tr><td colspan="10" class="history-empty">Completed calculations will appear here.</td></tr></tbody></table></div></section>
+    <section><div class="section-title"><div><p class="eyebrow">Search trace</p><h2>Annealing convergence</h2></div><div class="trace-stats"><span id="speed">— iter/s</span><span id="elapsed">0.00 s</span><span id="temperature">T —</span></div></div><svg id="chart" viewBox="0 0 900 210" role="img" aria-label="Best energy and overload by iteration"></svg></section>
+    <section><div class="section-title"><div><p class="eyebrow">Solution</p><h2>U-line layout</h2></div><button id="downloadSvg" class="secondary" disabled>Download SVG</button></div><div id="layout" class="layout-empty">Run the solver to generate the workstation layout.</div></section>
+    <section><div class="section-title"><div><p class="eyebrow">Cycle detail</p><h2>Workload matrix</h2></div><span id="sequence">Sequence —</span></div><div id="matrix" class="table-wrap"></div></section>
+  </div>
+</main>
+<script type="module" src="./app.js"></script></body></html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Manavizadeh 2015 · MMAL Laboratuvarı</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<header>
+  <div><p class="eyebrow">Karma modelli montaj hattı</p><h1>Dengeleme + sıralama</h1><p>Manavizadeh, Rabbani ve Radmehr (2015) için etkileşimli hesaplama aracı</p></div>
+  <p class="paper">Çevrim süresi · Fire · Tamamlanmamış iş</p>
+</header>
+<main>
+  <aside>
+    <section>
+      <div class="section-title"><div><p class="eyebrow">Girdi</p><h2>Problem tanımı</h2></div><label class="file">JSON içe aktar<input id="file" type="file" accept="application/json,.json"></label></div>
+      <label>Örnek veri<select id="preset"><option value="article-teaching-example.json">Makale deseni · 9 ürün / 10 görev</option><option value="verification-example.json">Küçük doğrulama örneği</option></select></label>
+      <label>Problem adı<input id="name"></label>
+      <div class="three">
+        <label>Hat biçimi<select id="lineType"><option value="u">U-hat</option><option value="straight">Düz hat</option></select></label>
+        <label>İstasyon (J)<input id="stationCount" type="number" min="1" step="1"></label>
+        <label>En az görev (LB)<input id="minimumTasks" type="number" min="0" step="1"></label>
+      </div>
+      <div class="three">
+        <label>Konveyör hızı (v)<input id="speedInput" type="number" min="0.001" step="any"></label>
+        <label>İstasyon boyu (L)<input id="lineLength" type="number" min="0.001" step="any"></label>
+        <label>İş yükü ağırlığı (ρ)<input id="rho" type="number" min="0" max="1" step="0.05"></label>
+      </div>
+      <label>Modeller ve talep <input id="models" placeholder="A:4, B:3, C:2"></label>
+      <p class="hint">MPS sırası taleplerin en büyük ortak bölenine göre oluşturulur. Makaledeki γ değeri otomatik hesaplanır.</p>
+      <div class="section-title compact"><h3>Görev süreleri t<sub>jm</sub></h3><button id="addTask" class="secondary">Görev ekle</button></div>
+      <div class="table-wrap task-scroll"><table id="taskTable"><thead><tr id="taskHead"></tr></thead><tbody></tbody></table></div>
+      <p id="validation" class="error" role="alert"></p>
+    </section>
+
+    <section>
+      <div class="section-title"><div><p class="eyebrow">Katsayılar</p><h2>İstasyon etkileri</h2></div><span class="formula">a<sub>jk</sub> · z<sub>jk</sub></span></div>
+      <p class="hint lead">Her görev-istasyon çifti için işlem oranı ve fire miktarı. U-hat seçildiğinde “karşı istasyonları eşitle” makaledeki simetri varsayımını uygular.</p>
+      <div class="actions small-actions"><button id="mirrorStations" class="secondary">Karşı istasyonları eşitle</button><button id="resetStationFactors" class="secondary">1 / 0 yap</button></div>
+      <div id="stationFactors" class="table-wrap factor-scroll"></div>
+    </section>
+
+    <section>
+      <div class="section-title"><div><p class="eyebrow">Sıra etkisi</p><h2>Pozisyon katsayıları</h2></div><span class="formula">a<sub>im</sub> · β<sub>im</sub></span></div>
+      <p class="hint lead">Her sıra pozisyonunda her modelin hız ve fire katsayısı. Dizi değiştikçe yalnız seçilen modelin hücresi kullanılır.</p>
+      <div class="actions small-actions"><button id="resetPositionFactors" class="secondary">1 / 1 yap</button></div>
+      <div id="positionFactors" class="table-wrap factor-scroll"></div>
+    </section>
+
+    <section>
+      <div class="section-title"><div><p class="eyebrow">Arama</p><h2>Çözüm ayarları</h2></div><button id="paperDefaults" class="secondary">Önerilen ayarlar</button></div>
+      <div class="param-grid">
+        <label>Başlangıç sıcaklığı<input data-param="temperature" type="number" min="0.001" step="any"></label>
+        <label>Soğuma oranı<input data-param="cooling" type="number" min="0.5" max="0.9999" step="0.001"></label>
+        <label>Toplam iterasyon<input data-param="iterations" type="number" min="200" step="100"></label>
+        <label>Tohum<input data-param="seed" type="number" step="1"></label>
+        <label>w₁ · çevrim<input data-param="weightCycle" type="number" min="0" step="0.05"></label>
+        <label>w₂ · fire<input data-param="weightWaste" type="number" min="0" step="0.05"></label>
+        <label>w₃ · iş yükü<input data-param="weightOverload" type="number" min="0" step="0.05"></label>
+      </div>
+      <label class="check"><input id="randomSeed" type="checkbox" checked> Her hesaplamada yeni tohum kullan</label>
+      <label class="check"><input id="continuousSearch" type="checkbox"> Sonuçtan sonra yeni tohumla sürekli hesapla</label>
+      <div class="actions"><button id="run">Hesapla</button><button id="stop" class="secondary" disabled>Durdur</button></div>
+    </section>
+  </aside>
+
+  <div class="workspace">
+    <section class="hero-panel">
+      <div><p class="eyebrow">Canlı çözüm</p><h2 id="status">Hazır</h2><span id="runSeed" class="run-seed">Tohum —</span></div>
+      <div class="metrics"><div><span>z₁ · çevrim</span><strong id="mCycle">—</strong></div><div><span>z₂ · fire</span><strong id="mWaste">—</strong></div><div><span>z₃ · iş yükü</span><strong id="mOverload">—</strong></div><div><span>Seçilen grup</span><strong id="mSource">—</strong></div><div><span>γ</span><strong id="mGamma">—</strong></div><div><span>Uygunluk</span><strong id="mFeasible">—</strong></div></div>
+      <button id="runAgain" class="hero-run">Yeniden hesapla</button>
+    </section>
+
+    <section class="history-panel">
+      <div class="section-title"><div><p class="eyebrow">Sonuç mantığı</p><h2>Saklanan hesaplamalar</h2></div><button id="clearHistory" class="secondary" disabled>Sonuçları temizle</button></div>
+      <div id="historyBest" class="best-summary" aria-live="polite"></div>
+      <div class="table-wrap"><table class="history-table"><thead><tr><th>Çalıştırma</th><th>Tohum</th><th>z₁</th><th>z₂</th><th>z₃</th><th>Grup</th><th>Süre</th><th></th></tr></thead><tbody id="runHistoryBody"><tr><td colspan="8" class="history-empty">Tamamlanan hesaplamalar burada görünecek.</td></tr></tbody></table></div>
+    </section>
+
+    <section>
+      <div class="section-title"><div><p class="eyebrow">Arama izi</p><h2>Yakınsama</h2></div><div class="trace-stats"><span id="calcSpeed">— iter/s</span><span id="elapsed">0.00 s</span><span id="iteration">0 iterasyon</span></div></div>
+      <svg id="chart" viewBox="0 0 900 210" role="img" aria-label="Normalize amaç değerinin iterasyonlara göre seyri"></svg>
+    </section>
+
+    <section>
+      <div class="section-title"><div><p class="eyebrow">Çözüm</p><h2>İstasyon dizilimi</h2></div><button id="downloadSvg" class="secondary" disabled>SVG indir</button></div>
+      <div id="layout" class="layout-empty">İstasyon dizilimi için hesaplamayı çalıştırın.</div>
+    </section>
+
+    <section>
+      <div class="section-title"><div><p class="eyebrow">Atamalar</p><h2>İstasyon atamaları tablosu</h2></div><span id="sequence">Sıra —</span></div>
+      <div id="assignmentTable" class="table-wrap"></div>
+    </section>
+
+    <section>
+      <div class="section-title"><div><p class="eyebrow">Makale sezgiseli</p><h2>Aday çözüm grupları</h2></div><span class="formula">Adım 1–4</span></div>
+      <div id="candidateTable" class="table-wrap"></div>
+      <p class="method-note">Üç tek-amaç çözümü ve ağırlıklı çok-amaç başlangıcı aynı çözüm uzayında aranır. Son adımda çok-amaç başlangıcına göre baskınlık, iyileşme ve normalize sapma birlikte değerlendirilir.</p>
+    </section>
+  </div>
+</main>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
