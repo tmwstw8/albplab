@@ -10,7 +10,7 @@ createServer(async (request, response) => {
   try {
     const pathname = new URL(request.url, 'http://localhost').pathname;
     if (pathname === '/') {
-      response.writeHead(302, { location: '/kara/index.html', 'cache-control': 'no-store' });
+      response.writeHead(302, { location: '/albp/index.html', 'cache-control': 'no-store' });
       response.end();
       return;
     }
@@ -25,6 +25,8 @@ createServer(async (request, response) => {
     response.end('Not found');
   }
 }).listen(port, '127.0.0.1', () => {
+  console.log(`ALBP Lab: http://127.0.0.1:${port}/albp/index.html`);
   console.log(`Kara 2006: http://127.0.0.1:${port}/kara/index.html`);
   console.log(`Manavizadeh 2015: http://127.0.0.1:${port}/manavizadeh/index.html`);
+  console.log(`Zengin crossover SA: http://127.0.0.1:${port}/zengin/index.html`);
 });

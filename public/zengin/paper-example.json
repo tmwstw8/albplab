@@ -1,0 +1,21 @@
+{
+  "problem": {
+    "name": "Kara et al. (2006) illustrative example",
+    "models": ["A", "B", "C"],
+    "demand": {"A": 2, "B": 2, "C": 1},
+    "cycleTime": 12,
+    "tasks": [
+      {"id": 1, "predecessors": [], "times": {"A": 5, "B": 4, "C": 5}},
+      {"id": 2, "predecessors": [], "times": {"A": 2, "B": 0, "C": 7}},
+      {"id": 3, "predecessors": [], "times": {"A": 2, "B": 6, "C": 5}},
+      {"id": 4, "predecessors": [1], "times": {"A": 4, "B": 0, "C": 2}},
+      {"id": 5, "predecessors": [4], "times": {"A": 0, "B": 6, "C": 6}},
+      {"id": 6, "predecessors": [2, 5], "times": {"A": 4, "B": 1, "C": 5}},
+      {"id": 7, "predecessors": [6], "times": {"A": 9, "B": 4, "C": 0}},
+      {"id": 8, "predecessors": [7], "times": {"A": 3, "B": 7, "C": 5}},
+      {"id": 9, "predecessors": [3, 7], "times": {"A": 0, "B": 6, "C": 5}},
+      {"id": 10, "predecessors": [9], "times": {"A": 3, "B": 7, "C": 1}}
+    ]
+  },
+  "saParams": {"T0": 1000, "Tmin": 1, "IT": 20, "R": 0.95, "p1": 0.8, "p2": 0.5, "p3": 0.5, "sideFlipProbability": 0.35, "quantityWeight": 100, "qualityWeight": 50, "adwWeight": 0.05, "maxIterations": 300000}
+}

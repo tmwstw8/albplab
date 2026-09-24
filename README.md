@@ -1,11 +1,35 @@
-# Montaj Hattı Araştırma Uygulamaları
+# ALBP Lab
 
-Bu çalışma alanında iki bağımsız uygulama bulunur:
+Bu çalışma alanında dört bağımsız uygulama bulunur:
 
 - **Kara, Özcan ve Peker (2006):** `http://127.0.0.1:4173/kara/index.html`
 - **Manavizadeh, Rabbani ve Radmehr (2015):** `http://127.0.0.1:4173/manavizadeh/index.html`
+- **Zengin crossover algoritması:** `http://127.0.0.1:4173/zengin/index.html`
+- **ALBP çoklu sezgisel hesaplayıcı:** `http://127.0.0.1:4173/albp/index.html`
 
-Ana adres Kara (2006) uygulamasına yönlenir. Her uygulamanın arayüzü, çözücüsü, worker dosyası ve örnek verileri kendi klasöründedir.
+Ana adres çoklu sezgisel ALBP hesaplayıcısına yönlenir. Her uygulamanın arayüzü, çözücüsü, worker dosyası ve örnek verileri kendi klasöründedir.
+
+## ALBP Çoklu Sezgisel Hesaplayıcı
+
+Kara (2006) uygulamasının veri modeli, Web Worker altyapısı, U-hattı görünümü ve iş yükü matrisi korunarak Simulated Annealing, Genetic Algorithm ve Variable Neighborhood Search aynı ekranda çalıştırılır. Üç yöntem de aynı başlangıç çözümünü, `K−1` komşu-istasyon birleştirme döngüsünü, öncelik ve çevrim uygulanabilirliğini, ön/arka istasyon atamasını, MPS sırasını, `Kb` faz hesabını ve ADW hesabını kullanır. Yalnızca uygulanamaz azaltılmış çözümü onaran iç sezgisel değişir.
+
+- **SA:** Kara'nın `p1`, `p2`, `p3`, `T0`, `Tmin`, `IT`, `R` ve güvenlik sınırıyla Metropolis kabulü.
+- **GA:** Zhan ve Zhang (2013) varsayılanlarıyla popülasyon, dengeleme ve sıra çaprazlamaları, iki mutasyon türü, turnuva, elitizm ve durgunluk sınırı. Sabit istasyon sayısı istemez; her görev için tek istasyonlu uygulanabilir çözümden başlayıp ortak `K−1` döngüsünde ilerler.
+- **VNS:** dengeleme swap/insert, sıra swap/insert ve isteğe bağlı lane-flip komşulukları; shake, yerel iniş ve kötüleşen merkeze geçebilme davranışı.
+
+Serbest lane ataması ve fiziksel U-rota tutarlılığı varsayılan olarak açıktır. Arama maliyeti varsayılan olarak yalnız ADW'dir; isteğe bağlı `ADW + λ × aşım` cezası açılabilir. Kullanıcı toplam bağımsız hesap sayısını belirler; koşular önce bütün SA, sonra GA, ardından VNS olacak şekilde bloklar halinde yürütülür. Adaylar ortak solution pool içinde tekilleştirilir; filtreler havuzun üstündedir ve tablo tüm metriklerde sıralanabilir.
+
+Çözüm havuzu; problem ve arama parametreleri, bütün koşular ve adaylar, filtre/sıralama durumu, seçili çözüm ve yakınsama grafiğiyle birlikte sürümlü JSON arşivi olarak dışa/içe aktarılabilir. Büyük havuzlar, tarayıcı belleğinde ikinci bir dev JSON kopyası oluşturmadan parça parça yazılır; worker aktarımı için en iyi adaylar sınırlı tutulur. İçe aktarma yeniden arama yapmadan U-hattı yerleşimi ile iş yükü matrisini çözüm verisinden kurar.
+
+## Zengin Crossover SA Laboratuvarı
+
+Yeni araştırma aracı, önce istasyon sayısı ve uygulanabilirliği koruyup crossover kullanımını iki ayrı boyutta inceler:
+
+- **Crossover quantity:** Ön ve arka tarafta en az bir görev bulunan istasyonların sayısı, `N_CW`.
+- **Crossover quality:** Her crossover istasyonu için `CB_j = 2 min(WF_j, WB_j) / (WF_j + WB_j)`. `175/5` yük dağılımı düşük, `90/90` dağılımı tam kalite alır.
+- **Birleşik amaç:** `wq × N_CW + wb × ΣCB_j − wa × ADW`. Ağırlıklar arayüzden değiştirilerek crossover sayısı yükseltilirken ortalama ve toplam kalitenin nasıl değiştiği deney tablosunda gözlenebilir.
+
+Araç; sürekli farklı tohumlarla hesaplama, sıralanabilir sonuç arşivi, quantity/quality yakınsama grafiği, kalite etiketli SVG üreticisi ve istasyon bazında ön/arka yük tablosu içerir.
 
 ## Manavizadeh 2015 MMAL Laboratuvarı
 

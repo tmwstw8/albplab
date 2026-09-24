@@ -1,0 +1,43 @@
+{
+  "format": "albp-solution-pool",
+  "version": 1,
+  "exportedAt": "2026-09-22T00:00:00.000Z",
+  "problem": {
+    "name": "Arşiv doğrulama örneği",
+    "cycleTime": 6,
+    "models": [{"id": "A", "demand": 1}],
+    "tasks": [
+      {"id": "1", "predecessors": [], "times": {"A": 4}},
+      {"id": "2", "predecessors": ["1"], "times": {"A": 5}}
+    ]
+  },
+  "params": {"algorithms": ["GA"], "calculations": 1, "seed": 42, "gaPopulation": 8, "gaGenerations": 2},
+  "result": {
+    "best": {"stations": [{"forward": ["1"], "backward": []}, {"forward": ["2"], "backward": []}], "sequence": ["A"]},
+    "solutions": [
+      {"algorithm": "GA", "run": 1, "iteration": 0, "solution": {"stations": [{"forward": ["1"], "backward": []}, {"forward": ["2"], "backward": []}], "sequence": ["A"]}}
+    ],
+    "runs": [
+      {"algorithm": "GA", "iterations": 2, "best": {"stations": [{"forward": ["1"], "backward": []}, {"forward": ["2"], "backward": []}], "sequence": ["A"]}, "solutions": [
+        {"algorithm": "GA", "run": 1, "iteration": 0, "solution": {"stations": [{"forward": ["1"], "backward": []}, {"forward": ["2"], "backward": []}], "sequence": ["A"]}}
+      ], "history": [{"iteration": 1, "best": 10, "overload": 0}, {"iteration": 2, "best": 9, "overload": 0}]}
+    ],
+    "iterations": 2
+  },
+  "history": [{"iteration": 1, "best": 10, "overload": 0}, {"iteration": 2, "best": 9, "overload": 0}],
+  "view": {
+    "filters": {"fAlgorithm": "GA", "fStations": "", "fOverload": "0", "fAdw": "", "fEfficiency": "", "fFeasible": true, "fPareto": false},
+    "sort": {"key": "stations", "direction": "asc"},
+    "visibleLimit": 20,
+    "selectedIndex": 0,
+    "selectedCycle": 0,
+    "randomSeed": false,
+    "publishedBenchmark": false,
+    "status": "Havuz hazır",
+    "traceTitle": "GA yakınsaması · hesap 1",
+    "runSeed": "Tohum 42",
+    "speed": "2 iter/sn",
+    "elapsed": "1.00 sn",
+    "iteration": "2 iterasyon"
+  }
+}

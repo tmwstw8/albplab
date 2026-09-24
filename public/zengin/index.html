@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Zengin Crossover SA Laboratuvarı</title><link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./zengin.css"></head>
+<body>
+<header><div><p class="eyebrow">Önerilen karma modelli U-hattı yöntemi</p><h1>Zengin Crossover SA Lab</h1><p>Crossover sayısını artır, ön/arka yük kalitesini ölç ve her annealing koşusunu karşılaştır.</p></div><div class="paper">Zengin algoritması · araştırma prototipi</div></header>
+<nav class="app-tabs" role="tablist" aria-label="Uygulama bölümleri"><button id="calculatorTab" class="app-tab is-active" role="tab" aria-selected="true">Hesaplayıcı</button><button id="documentationTab" class="app-tab" role="tab" aria-selected="false">Dokümantasyon</button></nav>
+<main id="calculatorView">
+  <aside>
+    <section><div class="section-title"><h2>Problem</h2><label class="file">JSON içe aktar<input id="file" type="file" accept="application/json,.json"></label></div>
+      <label>Hazır veri<select id="preset"><option value="default-problem.json">21 görev / 180 sn benchmark</option><option value="paper-example.json">Kara 2006 örneği</option></select></label>
+      <label>Ad<input id="name" value="Mixed-model U-line"></label>
+      <div class="two"><label>Çevrim süresi (sn)<input id="cycle" type="number" min="0.01" step="any" value="180"></label><label>Modeller<input id="models" value="A:5, B:2, C:12, D:1"></label></div>
+      <p class="hint">Modelleri <code>ID:talep</code> biçiminde virgülle ayırın.</p>
+      <div class="section-title compact"><h3>Görevler</h3><button id="addTask" class="secondary">Görev ekle</button></div>
+      <div class="table-wrap task-scroll"><table id="taskTable"><thead><tr id="taskHead"></tr></thead><tbody></tbody></table></div>
+      <p id="validation" class="error" role="alert"></p>
+    </section>
+    <section><div class="section-title"><h2>Simulated annealing</h2><button id="paperDefaults" class="secondary">Önerilen ayarlar</button></div>
+      <div class="param-grid">
+        <label>Başlangıç sıcaklığı (T₀)<input data-param="T0" type="number" value="1000"></label><label>Minimum sıcaklık (Tmin)<input data-param="Tmin" type="number" value="1"></label>
+        <label>Sıcaklık başına iterasyon (IT)<input data-param="IT" type="number" value="20"></label><label>Soğutma oranı (R)<input data-param="R" type="number" step="0.01" value="0.95"></label>
+        <label>Dengeleme olasılığı (p₁)<input data-param="p1" type="number" step="0.05" value="0.8"></label><label>Görev takası olasılığı (p₂)<input data-param="p2" type="number" step="0.05" value="0.5"></label>
+        <label>Sıra takası olasılığı (p₃)<input data-param="p3" type="number" step="0.05" value="0.5"></label><label>Taraf değiştirme olasılığı (pₛ)<input data-param="sideFlipProbability" type="number" step="0.05" value="0.35"></label>
+        <label>Quantity ağırlığı (wq)<input data-param="quantityWeight" type="number" step="1" value="100"></label><label>Quality ağırlığı (wb)<input data-param="qualityWeight" type="number" step="1" value="50"></label>
+        <label>ADW ağırlığı (wa)<input data-param="adwWeight" type="number" step="0.01" value="0.05"></label><label>Rastgele tohum (s)<input data-param="seed" type="number" value="42"></label>
+        <label class="wide">İterasyon güvenlik sınırı (Imax)<input data-param="maxIterations" type="number" value="300000"></label>
+      </div>
+      <p class="formula">Amaç: <b>max</b> w<sub>q</sub>N<sub>CW</sub> + w<sub>b</sub>ΣCB<sub>j</sub> − w<sub>a</sub>ADW. &nbsp; CB<sub>j</sub> = 2 min(W<sub>j</sub><sup>F</sup>, W<sub>j</sub><sup>B</sup>) / (W<sub>j</sub><sup>F</sup> + W<sub>j</sub><sup>B</sup>).</p>
+      <label class="seed-option"><input id="randomSeed" type="checkbox" checked> Her hesapta yeni rastgele tohum kullan</label>
+      <label class="seed-option"><input id="continuousSearch" type="checkbox"> Sonuç geldikçe yeni tohumla sürekli hesapla</label>
+      <div class="actions"><button id="run">Annealing çalıştır</button><button id="stop" class="secondary" disabled>Durdur</button></div>
+    </section>
+  </aside>
+  <div class="workspace">
+    <section class="hero-panel"><div><p class="eyebrow">Canlı koşu</p><h2 id="status">Hazır</h2><span id="runSeed" class="run-seed">Tohum (s) —</span></div><div class="metrics"><div><span>İstasyon (K)</span><strong id="mStations">—</strong></div><div><span>Amaç sonucu (Z)</span><strong id="mObjective">—</strong></div><div><span>CW quantity (N_CW)</span><strong id="mQuantity">—</strong></div><div><span>Ort. quality (CB̄)</span><strong id="mQuality">—</strong></div><div><span>Toplam quality (CBΣ)</span><strong id="mQualityTotal">—</strong></div><div><span>Yük sapması (ADW)</span><strong id="mAdw">—</strong></div><div><span>Aşım (O)</span><strong id="mOver">—</strong></div><div><span>Öncelik (P)</span><strong id="mPrec">—</strong></div><div><span>Verim (η)</span><strong id="mEff">—</strong></div></div><button id="runAgain" class="hero-run">Tekrar hesapla</button></section>
+    <section class="history-panel"><div class="section-title"><div><p class="eyebrow">Deney sonuçları</p><h2>Saklanan hesaplamalar</h2></div><div class="history-actions"><label class="file secondary-file">Sonuçları içe aktar<input id="resultFile" type="file" accept="application/json,.json"></label><button id="exportResults" class="secondary" disabled>Sonuçları dışa aktar</button><button id="clearHistory" class="secondary" disabled>Sonuçları temizle</button></div></div><div id="historyBest" class="best-summary" aria-live="polite"></div><div id="selectedRunDetail" class="selected-run-detail" hidden></div><div class="table-wrap"><table id="historyTable" class="history-table"><thead><tr><th><button class="sort-button" data-sort="id">Koşu (#)</button></th><th><button class="sort-button" data-sort="seed">Tohum (s)</button></th><th><button class="sort-button" data-sort="wq">Quantity ağırlığı (wq)</button></th><th><button class="sort-button" data-sort="wb">Quality ağırlığı (wb)</button></th><th><button class="sort-button" data-sort="wa">ADW ağırlığı (wa)</button></th><th><button class="sort-button" data-sort="z">Amaç sonucu (Z)</button></th><th><button class="sort-button" data-sort="stations">İstasyon (K)</button></th><th><button class="sort-button" data-sort="quantity">CW quantity (N_CW)</button></th><th><button class="sort-button" data-sort="quality">Ort. quality (CB̄)</button></th><th><button class="sort-button" data-sort="qualityTotal">Toplam quality (CBΣ)</button></th><th><button class="sort-button" data-sort="adw">Yük sapması (ADW)</button></th><th>Model sequence (MS)</th><th><button class="sort-button" data-sort="seconds">Süre (sn)</button></th><th></th></tr></thead><tbody id="runHistoryBody"><tr><td colspan="14" class="history-empty">Tamamlanan hesaplamalar burada görünecek.</td></tr></tbody></table></div><div class="show-more-wrap"><button id="showMoreResults" class="secondary" hidden>Daha fazla göster</button></div></section>
+    <section><div class="section-title"><div><p class="eyebrow">Arama izi</p><h2>Crossover quantity / quality yakınsaması</h2></div><div class="trace-stats"><span id="speed">— iter/sn</span><span id="elapsed">0.00 sn</span><span id="temperature">T —</span></div></div><svg id="chart" viewBox="0 0 900 210" role="img" aria-label="İterasyona göre crossover quantity ve quality"></svg></section>
+    <section><div class="section-title"><div><p class="eyebrow">Çözüm</p><h2>U-hattı yerleşimi</h2></div><button id="downloadSvg" class="secondary" disabled>SVG indir</button></div><div id="layout" class="layout-empty">İstasyon yerleşimini üretmek için çözücüyü çalıştırın.</div></section>
+    <section><div class="section-title"><div><p class="eyebrow">Cycle detail</p><h2>Workload matrix</h2></div><span class="matrix-action-hint">Bir cycle satırına tıklayarak SVG’yi güncelleyin.</span></div><div id="workloadMatrix" class="table-wrap"><p class="history-empty">Çözüm üretildiğinde cycle yük matrisi burada görünecek.</p></div></section>
+    <section><div class="section-title cycle-title"><div><p class="eyebrow">İstasyon içi denge</p><h2>Crossover kalite tablosu</h2><span id="sequence">MPS cycle ortalaması</span></div><div class="cycle-nav" aria-label="Cycle görünümü"><button id="averageCycle" class="secondary">MPS ort.</button><button id="previousCycle" class="secondary" aria-label="Önceki cycle">←</button><label>Görünüm<select id="cycleSelect" disabled><option value="-1">MPS cycle ortalaması</option></select></label><button id="nextCycle" class="secondary" aria-label="Sonraki cycle">→</button></div></div><div id="matrix" class="table-wrap"></div></section>
+    <section class="method-panel"><div class="section-title"><div><p class="eyebrow">Model dokümantasyonu</p><h2>Açıklama ve formülasyon</h2></div></div>
+      <div class="method-tabs" role="tablist" aria-label="Yöntem açıklaması">
+        <button class="method-tab is-active" role="tab" aria-selected="true" data-method-tab="notation">Notasyon sözlüğü</button>
+        <button class="method-tab" role="tab" aria-selected="false" data-method-tab="overview">Yaklaşım</button>
+        <button class="method-tab" role="tab" aria-selected="false" data-method-tab="formulation">Formülasyon</button>
+        <button class="method-tab" role="tab" aria-selected="false" data-method-tab="constraints">Kısıtlar ve SA</button>
+        <button class="method-tab" role="tab" aria-selected="false" data-method-tab="example">Manuel örnek</button>
+      </div>
+      <div class="method-content">
+        <article data-method-panel="notation">
+          <h3>Notasyon ve kısaltmalar</h3>
+          <p>Aşağıdaki semboller hesaplayıcı, SVG ve sonuç tablolarında aynı anlamda kullanılır. Sürelerin birimi saniyedir.</p>
+          <div class="notation-table-wrap"><table class="notation-table"><thead><tr><th>Sembol</th><th>Açılım</th><th>Tanım ve yorum</th><th>Aralık / birim</th></tr></thead><tbody>
+            <tr><th>I</th><td>Task set</td><td>Montaj hattındaki görevler kümesi; i belirli bir görevi gösterir.</td><td>i ∈ I</td></tr>
+            <tr><th>M</th><td>Model set</td><td>Ürün modelleri kümesi; m belirli bir modeli gösterir.</td><td>m ∈ M</td></tr>
+            <tr><th>d<sub>m</sub></th><td>Demand</td><td>Model m’nin talebi. MPS içindeki tekrar sayısını belirler.</td><td>Pozitif tamsayı</td></tr>
+            <tr><th>t<sub>im</sub></th><td>Task time</td><td>i görevinin m modeli üzerindeki işlem süresi.</td><td>saniye</td></tr>
+            <tr><th>t̄<sub>i</sub></th><td>Weighted task time</td><td>i görevinin model talepleriyle ağırlıklandırılmış ortalama süresi.</td><td>saniye</td></tr>
+            <tr><th>C</th><td>Cycle time</td><td>Bir istasyonun tek cycle’da aşmaması gereken kapasite sınırı.</td><td>saniye/cycle</td></tr>
+            <tr><th>K</th><td>Station count</td><td>Çözümde kullanılan toplam workstation sayısı. Birincil lexicographic ölçüttür.</td><td>Pozitif tamsayı</td></tr>
+            <tr><th>MPS</th><td>Minimum Part Set</td><td>Talep oranını en küçük tam sayılarla temsil eden ürün dizisi. Talepler ortak bölenlerine bölünür.</td><td>L ürün</td></tr>
+            <tr><th>MS</th><td>Model Sequence</td><td>MPS içindeki modellerin üretim sırası.</td><td>MS[1…L]</td></tr>
+            <tr><th>L</th><td>MPS length</td><td>Bir MPS’deki cycle/model pozisyonu sayısı.</td><td>Pozitif tamsayı</td></tr>
+            <tr><th>r</th><td>Cycle index</td><td>Workload matrix’te seçilen cycle/sıra pozisyonu.</td><td>r = 1,…,L</td></tr>
+            <tr><th>j</th><td>Station index</td><td>U-hattındaki workstation indeksi.</td><td>j = 1,…,K</td></tr>
+            <tr><th>SF<sub>j</sub></th><td>Station Front tasks</td><td>j istasyonuna U-hattının ön kolundan atanmış görevler kümesi.</td><td>SF<sub>j</sub> ⊆ I</td></tr>
+            <tr><th>SB<sub>j</sub></th><td>Station Back tasks</td><td>j istasyonuna U-hattının dönüş/arka kolundan atanmış görevler kümesi.</td><td>SB<sub>j</sub> ⊆ I</td></tr>
+            <tr><th>α<sub>j</sub><sup>r</sup></th><td>Front model</td><td>r cycle’ında j istasyonunun ön tarafında işlem gören model.</td><td>α ∈ M</td></tr>
+            <tr><th>β<sub>j</sub><sup>r</sup></th><td>Back model</td><td>r cycle’ında j istasyonunun arka tarafında işlem gören model.</td><td>β ∈ M</td></tr>
+            <tr><th>W<sub>jr</sub><sup>F</sup></th><td>Front workload</td><td>j istasyonunun r cycle’ındaki ön taraf iş yükü.</td><td>saniye</td></tr>
+            <tr><th>W<sub>jr</sub><sup>B</sup></th><td>Back workload</td><td>j istasyonunun r cycle’ındaki arka taraf iş yükü.</td><td>saniye</td></tr>
+            <tr><th>W<sub>jr</sub></th><td>Total cycle workload</td><td>Cycle bazında toplam istasyon yükü: W<sup>F</sup>+W<sup>B</sup>.</td><td>0 ≤ W<sub>jr</sub> ≤ C</td></tr>
+            <tr><th>W<sub>j</sub><sup>F</sup>, W<sub>j</sub><sup>B</sup></th><td>MPS-average side loads</td><td>Talep ağırlıklı ortalama ön ve arka yükler. Ana crossover amaçları bunlardan hesaplanır.</td><td>saniye</td></tr>
+            <tr><th>M<sub>j</sub></th><td>Crossover indicator</td><td>Her iki ortalama taraf yükü pozitifse 1, aksi halde 0.</td><td>{0,1}</td></tr>
+            <tr><th>N<sub>CW</sub></th><td>Crossover quantity</td><td>Crossover workstation sayısı: ΣM<sub>j</sub>.</td><td>0,…,K</td></tr>
+            <tr><th>CB<sub>j</sub></th><td>Crossover Balance / Quality</td><td>j istasyonunun ön/arka yük denge kalitesi. 1 tam denge, 0 tek taraflı kullanım.</td><td>0 ≤ CB<sub>j</sub> ≤ 1</td></tr>
+            <tr><th>CB<sup>Σ</sup></th><td>Total crossover quality</td><td>Crossover istasyonlarının kalite puanları toplamı: ΣM<sub>j</sub>CB<sub>j</sub>.</td><td>0,…,N<sub>CW</sub></td></tr>
+            <tr><th>CB̄</th><td>Mean crossover quality</td><td>Aktif crossover istasyonları arasındaki ortalama kalite: CB<sup>Σ</sup>/N<sub>CW</sub>.</td><td>0…1 veya %0…%100</td></tr>
+            <tr><th>FBAD</th><td>Front–Back Absolute Deviation</td><td>Crossover istasyonlarındaki mutlak ön/arka yük farklarının toplamı.</td><td>saniye; küçük daha iyi</td></tr>
+            <tr><th>C<sub>min</sub></th><td>Reference workload</td><td>Toplam talep ağırlıklı işin K istasyona eşit dağıtılmasıyla bulunan referans yük.</td><td>saniye</td></tr>
+            <tr><th>ADW</th><td>Absolute Deviation of Workload</td><td>Tüm istasyon ve cycle yüklerinin C<sub>min</sub> referansından toplam mutlak sapması.</td><td>saniye; küçük daha iyi</td></tr>
+            <tr><th>Overload</th><td>Cycle-time violation</td><td>Σmax(0,W<sub>jr</sub>−C). Sıfır değilse çözüm kapasite açısından uygulanamaz.</td><td>saniye; hedef 0</td></tr>
+            <tr><th>Z</th><td>Research objective</td><td>Aynı K içindeki quantity–quality–ADW birleşik maksimizasyon puanı.</td><td>Birim ağırlıklara bağlı</td></tr>
+            <tr><th>E</th><td>SA energy</td><td>Simulated annealing’in minimize ettiği, ceza terimleri ve −Z’den oluşan enerji.</td><td>Küçük daha iyi</td></tr>
+            <tr><th>w<sub>q</sub>, w<sub>b</sub>, w<sub>a</sub></th><td>Objective weights</td><td>Sırasıyla quantity, balance/quality ve ADW ağırlıkları.</td><td>≥ 0</td></tr>
+            <tr><th>T, T₀, T<sub>min</sub></th><td>Temperature</td><td>Mevcut, başlangıç ve bitiş SA sıcaklıkları.</td><td>Pozitif reel</td></tr>
+            <tr><th>R</th><td>Cooling rate</td><td>Her sıcaklık seviyesinden sonra T ← R·T güncellemesindeki soğutma katsayısı.</td><td>0 &lt; R &lt; 1</td></tr>
+            <tr><th>IT</th><td>Iterations per temperature</td><td>Her sıcaklık seviyesinde denenen komşu çözüm sayısı.</td><td>Pozitif tamsayı</td></tr>
+            <tr><th>p₁,p₂,p₃</th><td>Move probabilities</td><td>Dengeleme/sequencing seçimi, görev takası ve model sırası takası olasılıkları.</td><td>0…1</td></tr>
+            <tr><th>pₛ</th><td>Side-flip probability</td><td>Seçilen görevin aynı workstation içinde front ve back tarafları arasında geçirilme olasılığı.</td><td>0…1</td></tr>
+            <tr><th>s</th><td>Random seed</td><td>Rastgele sayı üretecinin başlangıç değeri; aynı parametrelerle tekrarlanabilirliği sağlar.</td><td>32-bit pozitif tamsayı</td></tr>
+            <tr><th>I<sub>max</sub></th><td>Iteration safety cap</td><td>Tek bir hesaplamanın gerçekleştirebileceği en yüksek toplam SA iterasyonu.</td><td>Pozitif tamsayı</td></tr>
+            <tr><th>η</th><td>Line efficiency</td><td>Talep ağırlıklı toplam işin K·C kapasitesine oranı.</td><td>0…1 veya %0…%100</td></tr>
+          </tbody></table></div>
+          <p class="method-note"><b>Kapsam ayrımı:</b> Üst sonuç kartındaki CW quantity ve quality değerleri MPS talep ortalamasıdır. Workload matrix ile bir cycle seçildiğinde alt kalite tablosu yalnız o cycle’ın W<sup>F</sup>, W<sup>B</sup>, CB ve FBAD değerlerini gösterir; ana optimizasyon puanı değişmez.</p>
+        </article>
+        <article data-method-panel="overview" hidden>
+          <h3>Zengin crossover yaklaşımı</h3>
+          <p>Yöntem önce uygulanabilir en küçük istasyon sayısını arar. Aynı istasyon sayısındaki çözümler arasında daha fazla crossover istasyonu ve daha dengeli ön/arka iş yükü ödüllendirilir; ADW ise ikincil denge cezasıdır.</p>
+          <div class="definition-grid"><div><b>Quantity</b><span>Ön ve arka tarafında pozitif yük bulunan crossover istasyonu sayısıdır.</span></div><div><b>Quality</b><span>Bir crossover istasyonunda küçük taraf yükünün toplam yüke göre ne kadar güçlü olduğunu ölçer.</span></div><div><b>MPS ortalaması</b><span>Görev süreleri model talepleriyle ağırlıklandırılır; tüm minimum parça setinin ortalama görünümüdür.</span></div><div><b>Cycle görünümü</b><span>Seçilen cycle’daki gerçek ön/arka modeller ve görev süreleri kullanılır.</span></div></div>
+          <p class="method-note">İstasyon sayısı lexicographic önceliklidir: daha fazla crossover elde etmek için ek istasyon açılmaz. Quantity ve quality karşılaştırması yalnız aynı istasyon sayısındaki uygulanabilir çözümler arasında yapılır.</p>
+        </article>
+        <article data-method-panel="formulation" hidden>
+          <h3>Tanımlar ve amaç fonksiyonu</h3>
+          <div class="formula-list">
+            <p><span class="formula-label">Talep ağırlıklı görev süresi</span><span class="equation">t̄<sub>i</sub> = (Σ<sub>m∈M</sub> d<sub>m</sub>t<sub>im</sub>) / (Σ<sub>m∈M</sub> d<sub>m</sub>)</span></p>
+            <p><span class="formula-label">MPS ön/arka yükleri</span><span class="equation">W<sub>j</sub><sup>F</sup> = Σ<sub>i∈SF<sub>j</sub></sub> t̄<sub>i</sub>, &nbsp; W<sub>j</sub><sup>B</sup> = Σ<sub>i∈SB<sub>j</sub></sub> t̄<sub>i</sub></span></p>
+            <p><span class="formula-label">Cycle model indeksleri</span><span class="equation">α<sub>j</sub><sup>r</sup> = MS[(r + 1 − j) mod L], &nbsp; β<sub>j</sub><sup>r</sup> = MS[(r + j) mod L]</span></p>
+            <p><span class="formula-label">Cycle yükleri</span><span class="equation">W<sub>jr</sub><sup>F</sup> = Σ<sub>i∈SF<sub>j</sub></sub>t<sub>i,α<sub>j</sub><sup>r</sup></sub>, &nbsp; W<sub>jr</sub><sup>B</sup> = Σ<sub>i∈SB<sub>j</sub></sub>t<sub>i,β<sub>j</sub><sup>r</sup></sub></span><span class="equation">W<sub>jr</sub> = W<sub>jr</sub><sup>F</sup> + W<sub>jr</sub><sup>B</sup> ≤ C</span></p>
+            <p><span class="formula-label">Crossover göstergesi</span><span class="equation">M<sub>j</sub> = 1 ⇔ W<sub>j</sub><sup>F</sup> &gt; 0 ∧ W<sub>j</sub><sup>B</sup> &gt; 0, &nbsp; N<sub>CW</sub> = Σ<sub>j</sub>M<sub>j</sub></span></p>
+            <p><span class="formula-label">İstasyon crossover kalitesi</span><span class="equation">CB<sub>j</sub> = 2 min(W<sub>j</sub><sup>F</sup>,W<sub>j</sub><sup>B</sup>) / (W<sub>j</sub><sup>F</sup>+W<sub>j</sub><sup>B</sup>)</span><span>0 klasik/tek taraflı, 1 tam dengeli crossover anlamına gelir.</span></p>
+            <p><span class="formula-label">Toplam ve ortalama kalite</span><span class="equation">CB<sup>Σ</sup> = Σ<sub>j</sub>M<sub>j</sub>CB<sub>j</sub>, &nbsp; CB̄ = CB<sup>Σ</sup>/N<sub>CW</sub></span></p>
+            <p><span class="formula-label">Front/back sapması</span><span class="equation">FBAD = Σ<sub>j</sub>M<sub>j</sub>|W<sub>j</sub><sup>F</sup>−W<sub>j</sub><sup>B</sup>|</span></p>
+            <p><span class="formula-label">ADW</span><span class="equation">C<sub>min</sub> = (Σ<sub>i</sub>t̄<sub>i</sub>)/K, &nbsp; ADW = Σ<sub>j=1</sub><sup>K</sup>Σ<sub>r=1</sub><sup>L</sup>|W<sub>jr</sub>−C<sub>min</sub>|</span></p>
+            <p class="objective"><span class="formula-label">Aynı K için amaç</span><span class="equation">max Z = w<sub>q</sub>N<sub>CW</sub> + w<sub>b</sub>CB<sup>Σ</sup> − w<sub>a</sub>ADW</span></p>
+            <p><span class="formula-label">SA minimizasyon enerjisi</span><span class="equation">E = 10<sup>5</sup>·Overload + 10<sup>9</sup>·P<sub>precedence</sub> − Z</span><span class="equation">P(kabul) = exp(−ΔE/T), &nbsp; T ← R·T</span></p>
+          </div>
+          <p class="method-note">Dış arama istasyonları birleştirerek K’yı azaltır. Çevrim süresi ve öncelik kısıtları uygulanabilirliği belirler; büyük cezalar uygulanamaz çözümleri amaç değerinden ayırır.</p>
+        </article>
+        <article data-method-panel="constraints" hidden>
+          <h3>Uygulanabilirlik ve simulated annealing akışı</h3>
+          <h4>Atama ve öncelik kısıtları</h4>
+          <ul><li>Her görev tam olarak bir istasyona ve bir tarafa atanır.</li><li>Boş workstation oluşturulmaz.</li><li>Ön kol görevleri istasyon sırasıyla, arka kol görevleri U dönüşünden sonra ters fiziksel rota sırasıyla değerlendirilir.</li><li>Her öncelik yayı (p,i) için route(p) ≤ route(i) olmalıdır. Yazılım ön taraf için route=istasyon indeksi, arka taraf için route=2K−1−istasyon indeksi kullanır.</li><li>Her j,r için W<sub>jr</sub> ≤ C olmalıdır; aksi yük Overload cezasına girer.</li></ul>
+          <h4>Arama sırası</h4>
+          <ol><li>Görevler geçerli bir topolojik sırayla başlangıçta tek taraflı istasyonlara yerleştirilir.</li><li>Komşu istasyonlar birleştirilerek daha küçük K denenir.</li><li>Birleştirme kapasite veya öncelik ihlali doğurursa SA görev taşıma, görev takası ve aynı istasyon içinde taraf değiştirme hamleleriyle onarım arar.</li><li>Model sırası swap veya insert hamleleriyle değiştirilir.</li><li>ΔE ≤ 0 olan komşu kabul edilir; kötü komşu exp(−ΔE/T) olasılığıyla kabul edilerek yerel optimumdan kaçılır.</li><li>Sıcaklık R katsayısıyla düşürülür. Aynı K için en büyük Z, eşitlikte en küçük ADW saklanır.</li><li>Daha küçük uygulanabilir K her zaman daha büyük K’ya üstün gelir; quantity için gereksiz workstation açılmaz.</li></ol>
+          <h4>Komşuluk parametreleri</h4>
+          <div class="definition-grid"><div><b>Dengeleme p₁</b><span>Yüksek değer görev atama/taraf hamlelerini; düşük değer model sırası hamlelerini artırır.</span></div><div><b>Takas p₂</b><span>Dengeleme hamlesinde iki görevi takas etme eğilimidir; aksi durumda tek görev taşınır.</span></div><div><b>Sıra takası p₃</b><span>Sequence hamlesinde swap seçimini; aksi durumda çıkar–ekle hareketini belirler.</span></div><div><b>Taraf değiştirme</b><span>Bir görevin aynı workstation içinde front ↔ back geçirilme olasılığıdır; crossover oluşumunu doğrudan keşfeder.</span></div></div>
+          <p class="method-note"><b>Tekrarlanabilirlik:</b> Rastgele tohum kapatılıp aynı seed ve parametreler kullanıldığında aynı çözüm üretilir. Sürekli arama modu farklı tohumlarla deney dağılımı toplamak içindir.</p>
+        </article>
+        <article data-method-panel="example" hidden>
+          <h3>Elle hesaplama örneği</h3>
+          <p>Çevrim süresi 180 sn olan iki farklı crossover istasyonunu düşünelim.</p>
+          <table class="manual-example"><thead><tr><th>İstasyon</th><th>W<sup>F</sup></th><th>W<sup>B</sup></th><th>CB hesabı</th><th>CB</th><th>|F−B|</th></tr></thead><tbody><tr><th>A</th><td>100</td><td>80</td><td>2×80/(100+80)</td><td class="quality-high">0,8889</td><td>20</td></tr><tr><th>B</th><td>175</td><td>5</td><td>2×5/(175+5)</td><td>0,0556</td><td>170</td></tr></tbody></table>
+          <p>Her iki istasyon da quantity açısından birer crossover’dır. Ancak A istasyonu iki tarafı gerçek anlamda kullanırken B istasyonu yalnız küçük bir görevi karşı tarafa taşıdığı için düşük kalite alır.</p>
+          <div class="worked-objective"><p><b>Örnek çözüm:</b> N<sub>CW</sub>=3, ΣCB=2,20 ve ADW=40 olsun.</p><p><b>Ağırlıklar:</b> w<sub>q</sub>=100, w<sub>b</sub>=50, w<sub>a</sub>=0,05.</p><p class="equation">Z = 100×3 + 50×2,20 − 0,05×40 = 300 + 110 − 2 = <b>408</b></p></div>
+          <p class="method-note">Quantity ağırlığı artırıldığında algoritma daha fazla crossover arar. Quality ağırlığı artırıldığında 175/5 gibi yapay crossover’lar yerine 100/80 gibi dengeli kullanımlar tercih edilir.</p>
+        </article>
+      </div>
+    </section>
+  </div>
+</main>
+<main id="documentationView" class="documentation-view" hidden><div id="documentationHost"></div></main>
+<script type="module" src="./app.js"></script></body></html>
