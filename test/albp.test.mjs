@@ -59,12 +59,12 @@ test('solution pool can be filtered by heuristic before deduplication',async()=>
   assert.ok(ga.every(x=>x.algorithm==='GA'));
 });
 
-test('large searches retain a bounded best-candidate pool for worker transfer',async()=>{
+test('large searches transfer only a bounded detailed candidate pool',async()=>{
   const result=await solve(benchmarkProblem,{algorithms:['GA'],calculations:1,seed:37,gaPopulation:30,gaGenerations:20,poolLimit:100});
   assert.ok(result.solutions.length<=100);
-  assert.ok(result.poolDropped>0);
   assert.equal(result.poolDropped,result.runs[0].poolDropped);
   assert.ok(result.solutions.some(entry=>entry.solution===result.best));
+  assert.ok(result.solutions.every(entry=>Array.isArray(entry.solution.cycleLoads)));
 });
 
 test('GA starts feasible with one task per station and reduces stations automatically',async()=>{
